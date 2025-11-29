@@ -5,7 +5,7 @@
     <!-- Logo and Close Button -->
     <div class="flex items-center justify-between mb-10">
         <div class="flex items-center gap-2">
-            <div class="w-8 h-8 bg-gradient-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
+            <div class="w-8 h-8 bg-linear-to-br from-indigo-500 to-purple-600 rounded-lg flex items-center justify-center">
                 <div class="w-4 h-4 bg-white rounded"></div>
             </div>
             <h1 class="text-xl font-medium text-slate-900 dark:text-slate-100">Moneta</h1>

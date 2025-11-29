@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Login - Moneta</title>
+    <title>Login</title>
     <script src="https://cdn.tailwindcss.com"></script>
     <script defer src="https://cdn.jsdelivr.net/npm/alpinejs@3.x.x/dist/cdn.min.js"></script>
 </head>
@@ -12,8 +12,7 @@
     <div class="w-full max-w-md" x-data="{ showPassword: false }">
         <!-- Logo/Brand -->
         <div class="text-center mb-8">
-            <h1 class="text-4xl font-bold text-black mb-2">Moneta</h1>
-            <p class="text-purple-100">Money Management Dashboard</p>
+            <h1 class="text-4xl font-bold text-black mb-2">Casholve</h1>
         </div>
 
         <!-- Login Card -->
@@ -83,7 +82,7 @@
                 <!-- Submit Button -->
                 <button 
                     type="submit"
-                    class="w-full bg-linear-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-600 hover:to-purple-700 transition shadow-lg hover:shadow-xl"
+                    class="w-full bg-gradient-to-r from-indigo-500 to-purple-600 text-white py-3 rounded-lg font-semibold hover:from-indigo-600 hover:to-purple-700 transition shadow-lg hover:shadow-xl"
                 >
                     Login
                 </button>
@@ -102,7 +101,7 @@
 
         <!-- Footer -->
         <p class="text-center text-purple-100 mt-6 text-sm">
-            © 2024 Moneta. All rights reserved.
+            © 2024 Casholve. All rights reserved.
         </p>
     </div>
 
