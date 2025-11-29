@@ -38,12 +38,12 @@
                         >
                             Edit Profile
                         </button>
-                        <button 
-                            onclick="alert('Change password feature coming soon!')"
+                        <a 
+                            href="{{ route('account.password') }}"
                             class="border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
                         >
                             Change Password
-                        </button>
+                        </a>
                     </div>
                 </div>
             </div>
@@ -169,7 +169,7 @@
         <div class="border border-slate-200 dark:border-slate-700 shadow-lg rounded-2xl p-6 bg-white dark:bg-slate-900">
             <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-4">Security</h3>
             <div class="space-y-3">
-                <button class="w-full flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition">
+                <a href="{{ route('account.password') }}" class="w-full flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,9 +184,9 @@
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                </button>
+                </a>
 
-                <button class="w-full flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition">
+                <button class="w-full flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition opacity-50 cursor-not-allowed">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-green-100 dark:bg-green-900/30 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-green-600 dark:text-green-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -195,7 +195,7 @@
                         </div>
                         <div class="text-left">
                             <p class="font-medium text-slate-900 dark:text-slate-100">Two-Factor Authentication</p>
-                            <p class="text-sm text-slate-500 dark:text-slate-400">Add extra security</p>
+                            <p class="text-sm text-slate-500 dark:text-slate-400">Coming soon</p>
                         </div>
                     </div>
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -209,7 +209,7 @@
         <div class="border border-red-200 dark:border-red-800 shadow-lg rounded-2xl p-6 bg-white dark:bg-slate-900">
             <h3 class="text-lg font-medium text-red-600 dark:text-red-400 mb-4">Danger Zone</h3>
             <div class="space-y-3">
-                <button class="w-full flex items-center justify-between p-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
+                <a href="{{ route('account.delete') }}" class="w-full flex items-center justify-between p-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,7 +224,7 @@
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                </button>
+                </a>
             </div>
         </div>
     </div>

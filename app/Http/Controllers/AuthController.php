@@ -68,21 +68,4 @@ class AuthController extends Controller
 
         return redirect('/')->with('success', 'Logout berhasil!');
     }
-
-    public function updateProfile(Request $request)
-    {
-        $user = Auth::user();
-        
-        $request->validate([
-            'name' => 'required|string|max:255',
-            'email' => 'required|string|email|max:255|unique:users,email,' . $user->id,
-        ]);
-
-        $user->update([
-            'name' => $request->name,
-            'email' => $request->email,
-        ]);
-
-        return redirect()->route('account')->with('success', 'Profile updated successfully!');
-    }
 }
