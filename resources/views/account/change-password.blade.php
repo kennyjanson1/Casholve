@@ -19,7 +19,7 @@
             
             <div class="flex items-start gap-6 mb-6">
                 <!-- User Avatar with Initial -->
-                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-3xl ring-4 ring-slate-100 dark:ring-slate-700">
+                <div class="w-24 h-24 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-3xl ring-4 ring-slate-100 dark:ring-slate-700">
                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
                 
