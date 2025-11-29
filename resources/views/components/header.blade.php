@@ -29,35 +29,24 @@
             </div>
         </div>
         
-        <!-- Right: Search, Notifications, Theme, Profile -->
-        <div class="flex items-center gap-4">
-            <!-- Search -->
-            <div class="hidden md:flex items-center relative">
-                <svg class="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z"></path>
-                </svg>
-                <input 
-                    type="search" 
-                    placeholder="Search"
-                    class="pl-10 w-64 rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
-                />
-            </div>
-            
+        <!-- Right: Actions -->
+        <div class="flex items-center gap-3">
             <!-- Theme Toggle -->
             <button 
                 @click="$store.theme.toggle()"
-                class="hidden md:flex p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
+                class="p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800"
             >
-                <!-- Light icon -->
+                <!-- Light icon (show when dark mode is OFF) -->
                 <svg x-show="!$store.theme.dark" class="w-5 h-5 text-slate-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.354 15.354A9 9 0 018.646 3.646 9.003 9.003 0 0012 21a9.003 9.003 0 008.354-5.646z"></path>
                 </svg>
 
-                <!-- Dark icon -->
+                <!-- Dark icon (show when dark mode is ON) -->
                 <svg x-show="$store.theme.dark" x-cloak class="w-5 h-5 text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 3v1m0 16v1m9-9h-1M4 12H3m15.364 6.364l-.707-.707M6.343 6.343l-.707-.707m12.728 0l-.707.707M6.343 17.657l-.707.707M16 12a4 4 0 11-8 0 4 4 0 018 0z"></path>
                 </svg>
-            </button>   
+            </button>
+            
             <!-- Notifications -->
             <button class="relative p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800">
                 <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -66,16 +55,18 @@
                 <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
             </button>
             
-            <!-- User Profile -->
-            <div class="flex items-center gap-2 cursor-pointer">
-                <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop" alt="Profile" class="w-9 h-9 rounded-full ring-2 ring-slate-100 dark:ring-slate-700">
-                <div class="hidden md:block">
-                    <p class="text-sm font-medium text-slate-900 dark:text-slate-100">Jhonson Mick</p>
-                    <p class="text-xs text-slate-500 dark:text-slate-400">Admin</p>
+            <!-- User Profile Dropdown -->
+            <div class="flex items-center gap-3 pl-3 border-l border-slate-200 dark:border-slate-700">
+                <!-- User Avatar -->
+                <div class="w-10 h-10 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-sm">
+                    {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
-                <svg class="w-4 h-4 text-slate-400 hidden md:block" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
+                
+                <!-- User Info (Hidden on mobile) -->
+                <div class="hidden md:block">
+                    <p class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ Auth::user()->name }}</p>
+                    <p class="text-xs text-slate-500 dark:text-slate-400">{{ Auth::user()->email }}</p>
+                </div>
             </div>
         </div>
     </div>
