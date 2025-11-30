@@ -63,7 +63,7 @@
                 </div>
                 
                 <!-- User Info (Hidden on mobile) -->
-                <div class="hidden md:block">
+                <div class="hidden flex md:block">
                     <p class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ Auth::user()->name }}</p>
                     <p class="text-xs text-slate-500 dark:text-slate-400">{{ Auth::user()->email }}</p>
                 </div>

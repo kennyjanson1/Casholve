@@ -19,7 +19,7 @@
             
             <div class="flex items-start gap-6 mb-6">
                 <!-- User Avatar with Initial -->
-                <div class="w-24 h-24 rounded-full bg-linear-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-3xl ring-4 ring-slate-100 dark:ring-slate-700">
+                <div class="w-24 h-24 rounded-full bg-gradient-to-br from-indigo-500 to-purple-600 flex items-center justify-center text-white font-bold text-3xl ring-4 ring-slate-100 dark:ring-slate-700">
                     {{ strtoupper(substr(Auth::user()->name, 0, 1)) }}
                 </div>
                 
@@ -34,16 +34,11 @@
                     <div class="flex gap-2">
                         <button 
                             onclick="enableEdit()"
+                            id="editBtn"
                             class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition"
                         >
                             Edit Profile
                         </button>
-                        <a 
-                            href="{{ route('account.password') }}"
-                            class="border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
-                        >
-                            Change Password
-                        </a>
                     </div>
                 </div>
             </div>
@@ -169,7 +164,7 @@
         <div class="border border-slate-200 dark:border-slate-700 shadow-lg rounded-2xl p-6 bg-white dark:bg-slate-900">
             <h3 class="text-lg font-medium text-slate-900 dark:text-slate-100 mb-4">Security</h3>
             <div class="space-y-3">
-                <a href="{{ route('account.password') }}" class="w-full flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition">
+                <button onclick="openChangePasswordModal()" class="w-full flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -184,7 +179,7 @@
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                </a>
+                </button>
 
                 <button class="w-full flex items-center justify-between p-3 hover:bg-slate-50 dark:hover:bg-slate-800 rounded-lg transition opacity-50 cursor-not-allowed">
                     <div class="flex items-center gap-3">
@@ -209,7 +204,7 @@
         <div class="border border-red-200 dark:border-red-800 shadow-lg rounded-2xl p-6 bg-white dark:bg-slate-900">
             <h3 class="text-lg font-medium text-red-600 dark:text-red-400 mb-4">Danger Zone</h3>
             <div class="space-y-3">
-                <a href="{{ route('account.delete') }}" class="w-full flex items-center justify-between p-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
+                <button onclick="openDeleteAccountModal()" class="w-full flex items-center justify-between p-3 hover:bg-red-50 dark:hover:bg-red-900/20 rounded-lg transition">
                     <div class="flex items-center gap-3">
                         <div class="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-lg flex items-center justify-center">
                             <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
@@ -224,25 +219,233 @@
                     <svg class="w-5 h-5 text-slate-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 5l7 7-7 7"></path>
                     </svg>
-                </a>
+                </button>
             </div>
         </div>
     </div>
 </div>
 
+<!-- Change Password Modal -->
+<div id="changePasswordModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full border border-slate-200 dark:border-slate-700 max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <h3 class="text-xl font-medium text-slate-900 dark:text-slate-100">Change Password</h3>
+                <button onclick="closeChangePasswordModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <form action="{{ route('account.password.update') }}" method="POST">
+                @csrf
+                @method('PUT')
+
+                <div class="space-y-4">
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Current Password</label>
+                        <input 
+                            type="password" 
+                            name="current_password"
+                            class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            required
+                        >
+                        @error('current_password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">New Password</label>
+                        <input 
+                            type="password" 
+                            name="password"
+                            class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            required
+                        >
+                        @error('password')
+                            <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                        @else
+                            <p class="text-xs text-slate-500 dark:text-slate-400 mt-1">Minimum 8 characters</p>
+                        @enderror
+                    </div>
+
+                    <div>
+                        <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">Confirm New Password</label>
+                        <input 
+                            type="password" 
+                            name="password_confirmation"
+                            class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-500"
+                            required
+                        >
+                    </div>
+                </div>
+
+                <div class="flex gap-3 mt-6">
+                    <button 
+                        type="submit"
+                        class="flex-1 bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2.5 text-sm font-medium transition"
+                    >
+                        Update Password
+                    </button>
+                    <button 
+                        type="button"
+                        onclick="closeChangePasswordModal()"
+                        class="flex-1 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Account Modal -->
+<div id="deleteAccountModal" class="fixed inset-0 bg-black/50 backdrop-blur-sm z-50 hidden items-center justify-center p-4">
+    <div class="bg-white dark:bg-slate-900 rounded-2xl shadow-2xl max-w-md w-full border border-red-200 dark:border-red-800 max-h-[90vh] overflow-y-auto">
+        <div class="p-6">
+            <div class="flex items-center justify-between mb-4">
+                <div class="flex items-center gap-3">
+                    <div class="w-10 h-10 bg-red-100 dark:bg-red-900/30 rounded-full flex items-center justify-center">
+                        <svg class="w-5 h-5 text-red-600 dark:text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-xl font-medium text-slate-900 dark:text-slate-100">Delete Account</h3>
+                </div>
+                <button onclick="closeDeleteAccountModal()" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <svg class="w-6 h-6" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12"></path>
+                    </svg>
+                </button>
+            </div>
+
+            <!-- Warning -->
+            <div class="bg-red-50 dark:bg-red-900/20 border border-red-200 dark:border-red-800 rounded-lg p-4 mb-4">
+                <p class="text-sm text-red-700 dark:text-red-400 font-medium mb-2">⚠️ This action cannot be undone!</p>
+                <ul class="text-xs text-red-600 dark:text-red-400 space-y-1">
+                    <li>• All your data will be permanently deleted</li>
+                    <li>• All categories will be removed</li>
+                    <li>• All transactions will be removed</li>
+                </ul>
+            </div>
+
+            <form action="{{ route('account.destroy') }}" method="POST" id="deleteAccountForm">
+                @csrf
+                @method('DELETE')
+
+                <div class="mb-4">
+                    <label class="block text-sm font-medium text-slate-600 dark:text-slate-400 mb-2">
+                        Enter your password to confirm
+                    </label>
+                    <input 
+                        type="password" 
+                        name="password"
+                        placeholder="Enter your password"
+                        class="w-full rounded-lg border border-slate-200 dark:border-slate-700 bg-white dark:bg-slate-800 text-slate-900 dark:text-slate-100 px-4 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-red-500"
+                        required
+                    >
+                    @error('password')
+                        <p class="text-red-500 text-xs mt-1">{{ $message }}</p>
+                    @enderror
+                </div>
+
+                <div class="flex gap-3">
+                    <button 
+                        type="submit"
+                        onclick="return confirm('Are you absolutely sure? Type YES to confirm.')"
+                        class="flex-1 bg-red-600 hover:bg-red-700 text-white rounded-lg px-4 py-2.5 text-sm font-medium transition"
+                    >
+                        Yes, Delete My Account
+                    </button>
+                    <button 
+                        type="button"
+                        onclick="closeDeleteAccountModal()"
+                        class="flex-1 border border-slate-200 dark:border-slate-700 rounded-lg px-4 py-2.5 text-sm font-medium text-slate-700 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800 transition"
+                    >
+                        Cancel
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+
 <script>
+// Edit Profile Functions
 function enableEdit() {
     document.getElementById('nameInput').disabled = false;
     document.getElementById('emailInput').disabled = false;
     document.getElementById('editButtons').classList.remove('hidden');
+    document.getElementById('editButtons').classList.add('flex');
+    document.getElementById('editBtn').classList.add('hidden');
 }
 
 function cancelEdit() {
     document.getElementById('nameInput').disabled = true;
     document.getElementById('emailInput').disabled = true;
     document.getElementById('editButtons').classList.add('hidden');
-    // Reset form to original values
+    document.getElementById('editButtons').classList.remove('flex');
+    document.getElementById('editBtn').classList.remove('hidden');
     document.getElementById('profileForm').reset();
 }
+
+// Change Password Modal Functions
+function openChangePasswordModal() {
+    const modal = document.getElementById('changePasswordModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeChangePasswordModal() {
+    const modal = document.getElementById('changePasswordModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = 'auto';
+}
+
+// Delete Account Modal Functions
+function openDeleteAccountModal() {
+    const modal = document.getElementById('deleteAccountModal');
+    modal.classList.remove('hidden');
+    modal.classList.add('flex');
+    document.body.style.overflow = 'hidden';
+}
+
+function closeDeleteAccountModal() {
+    const modal = document.getElementById('deleteAccountModal');
+    modal.classList.add('hidden');
+    modal.classList.remove('flex');
+    document.body.style.overflow = 'auto';
+}
+
+// Close modal when clicking outside
+document.getElementById('changePasswordModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeChangePasswordModal();
+});
+
+document.getElementById('deleteAccountModal')?.addEventListener('click', function(e) {
+    if (e.target === this) closeDeleteAccountModal();
+});
+
+// Close modal with Escape key
+document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+        closeChangePasswordModal();
+        closeDeleteAccountModal();
+    }
+});
+
+// Auto-open modal if there's validation error
+@if(session('modal') == 'changePassword')
+    openChangePasswordModal();
+@endif
+
+@if(session('modal') == 'deleteAccount')
+    openDeleteAccountModal();
+@endif
 </script>
 @endsection

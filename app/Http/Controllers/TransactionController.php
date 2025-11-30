@@ -57,10 +57,40 @@ class TransactionController extends Controller
         return view('transactions.index', compact('transactions', 'categories'));
     }
 
+    public function storeBulk(Request $request){
+        $request->validate([
+            'transactions' => 'required|array|min:1',
+            'transactions.*.category_id' => 'required|exists:categories,id',
+            'transactions.*.title' => 'required|string|max:255',
+            'transactions.*.description' => 'nullable|string',
+            'transactions.*.amount' => 'required|numeric|min:0',
+            'transactions.*.type' => 'required|in:income,expense',
+            'transactions.*.date' => 'required|date',
+        ]);
+
+        $savedCount = 0;
+        
+        foreach ($request->transactions as $transactionData) {
+            Transaction::create([
+                'user_id' => auth()->id(),
+                'category_id' => $transactionData['category_id'],
+                'title' => $transactionData['title'],
+                'description' => $transactionData['description'] ?? null,
+                'amount' => $transactionData['amount'],
+                'type' => $transactionData['type'],
+                'date' => $transactionData['date'],
+            ]);
+            $savedCount++;
+        }
+
+        return redirect()->route('transactions.index')
+            ->with('success', "{$savedCount} transaction(s) created successfully!");
+    }
+
     public function create()
     {
         $categories = Category::forUser(auth()->user()->id)->get();
-        return view('transactions.create', compact('categories'));
+        return view('transaction', compact('categories'));
     }
 
     public function store(Request $request)

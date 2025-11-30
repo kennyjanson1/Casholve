@@ -5,15 +5,12 @@ use App\Http\Controllers\AuthController;
 use App\Http\Controllers\AccountController;
 use App\Http\Controllers\CategoryController;
 use App\Http\Controllers\DashboardController;
-use App\Http\Controllers\SavingsPlanController;
+use App\Http\Controllers\GoalsController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\SavingsTransactionController;
 
-/*
-|--------------------------------------------------------------------------
-| Guest Routes (Login & Register)
-|--------------------------------------------------------------------------
-*/
+
+
 Route::middleware('guest')->group(function () {
     Route::get('/', [AuthController::class, 'showLoginForm'])->name('login');
     Route::post('/login', [AuthController::class, 'login']);
@@ -33,16 +30,6 @@ Route::middleware('auth')->group(function () {
     
     /*
     |--------------------------------------------------------------------------
-    | Account Management
-    |--------------------------------------------------------------------------
-    */
-    Route::get('/account', [AccountController::class, 'index'])->name('account');
-    Route::put('/account', [AccountController::class, 'update'])->name('account.update');
-    Route::put('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
-    Route::delete('/account', [AccountController::class, 'destroy'])->name('account.destroy');
-    
-    /*
-    |--------------------------------------------------------------------------
     | Dashboard (Main Page with Analytics)
     |--------------------------------------------------------------------------
     */
@@ -55,6 +42,9 @@ Route::middleware('auth')->group(function () {
     */
     // Main transaction routes (CRUD)
     Route::resource('transactions', TransactionController::class);
+    
+    // Bulk transaction insert
+    Route::post('transactions/bulk/store', [TransactionController::class, 'storeBulk'])->name('transactions.storeBulk');
     
     // Soft delete features
     Route::get('transactions/trash/list', [TransactionController::class, 'trash'])->name('transactions.trash');
@@ -83,22 +73,27 @@ Route::middleware('auth')->group(function () {
     
     /*
     |--------------------------------------------------------------------------
-    | Savings Plans / Goals Management
+    | Goals Management (formerly Savings Plans)
     |--------------------------------------------------------------------------
     */
-    // Main savings plan routes (CRUD)
-    Route::resource('savings', SavingsPlanController::class);
+    // Main goals routes (CRUD)
+    Route::resource('goals', GoalsController::class);
     
     // Additional actions
-    Route::post('savings/{savingsPlan}/complete', [SavingsPlanController::class, 'complete'])->name('savings.complete');
-    Route::post('savings/{savingsPlan}/cancel', [SavingsPlanController::class, 'cancel'])->name('savings.cancel');
+    Route::post('goals/{savingsPlan}/complete', [GoalsController::class, 'complete'])->name('goals.complete');
+    Route::post('goals/{savingsPlan}/cancel', [GoalsController::class, 'cancel'])->name('goals.cancel');
     
-    // Savings Transactions (deposit/withdraw)
-    Route::post('savings/{savingsPlan}/transactions', [SavingsTransactionController::class, 'store'])->name('savings.transactions.store');
-    Route::delete('savings-transactions/{savingsTransaction}', [SavingsTransactionController::class, 'destroy'])->name('savings.transactions.destroy');
+    // Goals Transactions (deposit/withdraw)
+    Route::post('goals/{savingsPlan}/transactions', [SavingsTransactionController::class, 'store'])->name('goals.transactions.store');
+    Route::delete('goals-transactions/{savingsTransaction}', [SavingsTransactionController::class, 'destroy'])->name('goals.transactions.destroy');
     
-    // Keep your old goals view if needed (redirect to savings)
-    Route::get('/goals', function () {
-        return redirect()->route('savings.index');
-    })->name('goals');
+    /*
+    |--------------------------------------------------------------------------
+    | Account Management (Components)
+    |--------------------------------------------------------------------------
+    */
+    Route::get('/account', [AccountController::class, 'index'])->name('account');
+    Route::put('/account', [AccountController::class, 'update'])->name('account.update');
+    Route::put('/account/password', [AccountController::class, 'updatePassword'])->name('account.password.update');
+    Route::delete('/account', [AccountController::class, 'destroy'])->name('account.destroy');
 });

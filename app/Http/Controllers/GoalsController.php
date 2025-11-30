@@ -6,7 +6,7 @@ use App\Models\SavingsPlan;
 use Illuminate\Http\Request;
 use Illuminate\Foundation\Auth\Access\AuthorizesRequests;
 
-class SavingsPlanController extends Controller
+class GoalsController extends Controller
 {
     use AuthorizesRequests;
 
@@ -22,12 +22,12 @@ class SavingsPlanController extends Controller
 
         $savingsPlans = $query->orderBy('deadline', 'asc')->get();
 
-        return view('savings.index', compact('savingsPlans'));
+        return view('goals', compact('savingsPlans'));
     }
 
     public function create()
     {
-        return view('savings.create');
+        return view('goals.create');
     }
 
     public function store(Request $request)
@@ -46,8 +46,8 @@ class SavingsPlanController extends Controller
 
         SavingsPlan::create($validated);
 
-        return redirect()->route('savings.index')
-            ->with('success', 'Savings plan created successfully!');
+        return redirect()->route('goals.index')
+            ->with('success', 'Goal created successfully!');
     }
 
     public function show(SavingsPlan $savingsPlan)
@@ -56,14 +56,14 @@ class SavingsPlanController extends Controller
 
         $savingsPlan->load('savingsTransactions');
         
-        return view('savings.show', compact('savingsPlan'));
+        return view('goals.show', compact('savingsPlan'));
     }
 
     public function edit(SavingsPlan $savingsPlan)
     {
         $this->authorize('update', $savingsPlan);
 
-        return view('savings.edit', compact('savingsPlan'));
+        return view('goals.edit', compact('savingsPlan'));
     }
 
     public function update(Request $request, SavingsPlan $savingsPlan)
@@ -84,8 +84,8 @@ class SavingsPlanController extends Controller
             $savingsPlan->update(['status' => 'completed']);
         }
 
-        return redirect()->route('savings.index')
-            ->with('success', 'Savings plan updated successfully!');
+        return redirect()->route('goals.index')
+            ->with('success', 'Goal updated successfully!');
     }
 
     public function destroy(SavingsPlan $savingsPlan)
@@ -94,8 +94,8 @@ class SavingsPlanController extends Controller
 
         $savingsPlan->delete();
 
-        return redirect()->route('savings.index')
-            ->with('success', 'Savings plan deleted successfully!');
+        return redirect()->route('goals.index')
+            ->with('success', 'Goal deleted successfully!');
     }
 
     public function complete(SavingsPlan $savingsPlan)
@@ -104,8 +104,8 @@ class SavingsPlanController extends Controller
 
         $savingsPlan->update(['status' => 'completed']);
 
-        return redirect()->route('savings.show', $savingsPlan)
-            ->with('success', 'Savings plan marked as completed!');
+        return redirect()->route('goals.show', $savingsPlan)
+            ->with('success', 'Goal marked as completed!');
     }
 
     public function cancel(SavingsPlan $savingsPlan)
@@ -114,7 +114,7 @@ class SavingsPlanController extends Controller
 
         $savingsPlan->update(['status' => 'canceled']);
 
-        return redirect()->route('savings.index')
-            ->with('success', 'Savings plan canceled.');
+        return redirect()->route('goals.index')
+            ->with('success', 'Goal canceled.');
     }
 }

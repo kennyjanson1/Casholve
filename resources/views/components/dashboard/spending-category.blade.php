@@ -1,12 +1,40 @@
+{{-- resources/views/components/dashboard/spending-chart.blade.php --}}
+
 @php
-    $categories = [
-        ['name' => 'Eat', 'percentage' => 30, 'color' => '#6366f1'],
-        ['name' => 'Shopping', 'percentage' => 20, 'color' => '#e2e8f0'],
-        ['name' => 'Transport', 'percentage' => 20, 'color' => '#22d3ee'],
-        ['name' => 'Subscription', 'percentage' => 15, 'color' => '#10b981'],
-        ['name' => 'Cafe', 'percentage' => 10, 'color' => '#4f46e5'],
-        ['name' => 'Utilities', 'percentage' => 5, 'color' => '#6366f1'],
-    ];
+    use Carbon\Carbon;
+    
+    $startOfMonth = Carbon::now()->startOfMonth();
+    $endOfMonth = Carbon::now()->endOfMonth();
+    
+    // Get expenses by category for current month
+    $categorySpending = auth()->user()->transactions()
+        ->where('type', 'expense')
+        ->whereBetween('date', [$startOfMonth, $endOfMonth])
+        ->with('category')
+        ->get()
+        ->groupBy('category_id')
+        ->map(function($transactions) {
+            $category = $transactions->first()->category;
+            return [
+                'name' => $category->name ?? 'Uncategorized',
+                'amount' => $transactions->sum('amount'),
+                'color' => $category->color ?? '#6366f1',
+            ];
+        })
+        ->sortByDesc('amount')
+        ->values();
+    
+    $totalSpending = $categorySpending->sum('amount');
+    
+    // Calculate percentages
+    $categories = $categorySpending->map(function($cat) use ($totalSpending) {
+        return [
+            'name' => $cat['name'],
+            'amount' => $cat['amount'],
+            'percentage' => $totalSpending > 0 ? round(($cat['amount'] / $totalSpending) * 100, 1) : 0,
+            'color' => $cat['color'],
+        ];
+    })->toArray();
 @endphp
 
 <div class="border border-slate-200 dark:border-slate-700 shadow-lg rounded-2xl p-6 bg-white dark:bg-slate-900 h-full">
@@ -20,27 +48,43 @@
         </button>
     </div>
 
-    <div class="text-3xl font-medium text-slate-900 dark:text-slate-100 mb-6">$15,000.00</div>
-
-    <!-- Donut Chart Placeholder -->
-    <div class="relative mb-6 flex items-center justify-center h-48">
-        <canvas id="spendingChart"></canvas>
+    <div class="text-3xl font-medium text-slate-900 dark:text-slate-100 mb-6">
+        Rp {{ number_format($totalSpending, 0, ',', '.') }}
     </div>
 
-    <!-- Legend -->
-    <div class="grid grid-cols-2 gap-y-3 gap-x-6">
-        @foreach($categories as $category)
-        <div class="flex items-center justify-between">
-            <div class="flex items-center gap-2">
-                <div class="w-3 h-3 rounded-sm" style="background-color: {{ $category['color'] }}"></div>
-                <span class="text-sm text-slate-600 dark:text-slate-400">{{ $category['name'] }}</span>
-            </div>
-            <span class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ $category['percentage'] }}%</span>
+    @if(count($categories) > 0)
+        <!-- Donut Chart -->
+        <div class="relative mb-6 flex items-center justify-center h-48">
+            <canvas id="spendingChart"></canvas>
         </div>
-        @endforeach
-    </div>
+
+        <!-- Legend -->
+        <div class="grid grid-cols-2 gap-y-3 gap-x-6">
+            @foreach($categories as $category)
+            <div class="flex items-center justify-between">
+                <div class="flex items-center gap-2">
+                    <div class="w-3 h-3 rounded-sm" style="background-color: {{ $category['color'] }}"></div>
+                    <span class="text-sm text-slate-600 dark:text-slate-400">{{ $category['name'] }}</span>
+                </div>
+                <span class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ $category['percentage'] }}%</span>
+            </div>
+            @endforeach
+        </div>
+    @else
+        <!-- Empty State -->
+        <div class="flex flex-col items-center justify-center py-12 text-center">
+            <svg class="w-16 h-16 text-slate-300 dark:text-slate-600 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 01-2 2h-2a2 2 0 01-2-2z"></path>
+            </svg>
+            <p class="text-slate-600 dark:text-slate-400 text-sm">No expenses recorded this month</p>
+            <a href="{{ route('transactions.create') }}" class="mt-4 text-indigo-600 dark:text-indigo-400 text-sm font-medium hover:underline">
+                Add your first expense
+            </a>
+        </div>
+    @endif
 </div>
 
+@if(count($categories) > 0)
 @push('scripts')
 <script>
 document.addEventListener('DOMContentLoaded', function() {
@@ -63,6 +107,14 @@ document.addEventListener('DOMContentLoaded', function() {
                 plugins: {
                     legend: {
                         display: false
+                    },
+                    tooltip: {
+                        callbacks: {
+                            label: function(context) {
+                                const amount = @json(array_column($categories, 'amount'))[context.dataIndex];
+                                return context.label + ': Rp ' + amount.toLocaleString('id-ID') + ' (' + context.parsed + '%)';
+                            }
+                        }
                     }
                 }
             }
@@ -71,3 +123,4 @@ document.addEventListener('DOMContentLoaded', function() {
 });
 </script>
 @endpush
+@endif
