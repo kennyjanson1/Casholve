@@ -45,7 +45,7 @@ class TransactionController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                  ->orWhere('description', 'like', "%{$search}%");
+                ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -54,7 +54,7 @@ class TransactionController extends Controller
         $transactions = $query->paginate(15);
         $categories = Category::forUser(auth()->user()->id)->get();
 
-        return view('transactions.index', compact('transactions', 'categories'));
+        return view('transaction', compact('transactions', 'categories')); // ✅ Ubah baris ini
     }
 
     public function storeBulk(Request $request){
@@ -87,10 +87,11 @@ class TransactionController extends Controller
             ->with('success', "{$savedCount} transaction(s) created successfully!");
     }
 
+    // ✅ BENAR
     public function create()
     {
         $categories = Category::forUser(auth()->user()->id)->get();
-        return view('transaction', compact('categories'));
+        return view('transactions.create', compact('categories')); // Atau sesuai nama file view Anda
     }
 
     public function store(Request $request)

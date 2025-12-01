@@ -1,7 +1,13 @@
 @extends('layouts.app')
 
-@section('title', 'Account - Moneta')
+@section('title', 'Transaction - Moneta')
 
 @section('content')
-    <x-transactions.create :categories="$categories" />
+<div class="space-y-6">
+    <!-- Stats Cards -->
+    @include('components.transactions.stats-cards')
+
+    <!-- Transactions Table -->
+    @include('components.transactions.table')
+</div>
 @endsection

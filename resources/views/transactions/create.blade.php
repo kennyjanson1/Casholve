@@ -143,6 +143,8 @@ document.addEventListener('click', function(e) {
         if (document.querySelectorAll('.transaction-item').length > 1) {
             item.remove();
             reindexTransactions();
+        } else {
+            alert('You must have at least one transaction');
         }
     }
 });
