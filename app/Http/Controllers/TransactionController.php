@@ -45,7 +45,7 @@ class TransactionController extends Controller
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                ->orWhere('description', 'like', "%{$search}%");
+                    ->orWhere('description', 'like', "%{$search}%");
             });
         }
 
@@ -57,7 +57,8 @@ class TransactionController extends Controller
         return view('transaction', compact('transactions', 'categories')); // ✅ Ubah baris ini
     }
 
-    public function storeBulk(Request $request){
+    public function storeBulk(Request $request)
+    {
         $request->validate([
             'transactions' => 'required|array|min:1',
             'transactions.*.category_id' => 'required|exists:categories,id',
@@ -69,7 +70,7 @@ class TransactionController extends Controller
         ]);
 
         $savedCount = 0;
-        
+
         foreach ($request->transactions as $transactionData) {
             Transaction::create([
                 'user_id' => auth()->id(),
@@ -116,7 +117,7 @@ class TransactionController extends Controller
     public function show(Transaction $transaction)
     {
         $this->authorize('view', $transaction);
-        
+
         $transaction->load('category');
         return view('transactions.show', compact('transaction'));
     }
@@ -124,7 +125,7 @@ class TransactionController extends Controller
     public function edit(Transaction $transaction)
     {
         $this->authorize('update', $transaction);
-        
+
         $categories = Category::forUser(auth()->user()->id)->get();
         return view('transactions.edit', compact('transaction', 'categories'));
     }
@@ -161,7 +162,7 @@ class TransactionController extends Controller
     public function restore($id)
     {
         $transaction = Transaction::withTrashed()->findOrFail($id);
-        
+
         $this->authorize('restore', $transaction);
 
         $transaction->restore();

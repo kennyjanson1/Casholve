@@ -26,7 +26,7 @@
             </div>
 
             <p class="text-sm text-slate-500 dark:text-slate-400">
-                Your Balance in {{ now()->format('F Y') }}
+                Your Balance in {{ $currentMonth ?? now()->format('F Y') }}
             </p>
         </div>
 

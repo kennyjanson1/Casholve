@@ -6,6 +6,7 @@ use App\Models\Transaction;
 use App\Models\SavingsPlan;
 use Illuminate\Support\Facades\Auth;
 use Illuminate\Support\Facades\DB;
+use Illuminate\Support\Carbon;
 
 class DashboardController extends Controller
 {
@@ -101,6 +102,8 @@ class DashboardController extends Controller
         $startOfMonth = now()->startOfMonth();
         $endOfMonth   = now()->endOfMonth();
 
+        $currentMonth = Carbon::now()->format('F Y');
+
         $currentIncome = Transaction::where('user_id', $user->id)
             ->income()
             ->whereBetween('date', [$startOfMonth, $endOfMonth])
@@ -142,6 +145,35 @@ class DashboardController extends Controller
             ? (($currentExpense - $prevExpense) / abs($prevExpense)) * 100
             : 0;
 
+        $startOfYear = Carbon::now()->startOfYear();
+        $endOfYear   = Carbon::now()->endOfYear();
+
+        $months = [];
+        $monthlyIncome = [];
+        $monthlyExpenses = [];
+
+        for ($i = 1; $i <= 12; $i++) {
+
+            $monthName = Carbon::create()->month($i)->format('M');
+            $months[] = $monthName;
+
+            $income = Transaction::where('user_id', auth()->id())
+                ->income()
+                ->whereYear('date', now()->year)
+                ->whereMonth('date', $i)
+                ->sum('amount');
+
+            $expense = Transaction::where('user_id', auth()->id())
+                ->expense()
+                ->whereYear('date', now()->year)
+                ->whereMonth('date', $i)
+                ->sum('amount');
+
+            $monthlyIncome[] = $income;
+            $monthlyExpenses[] = $expense;
+        }
+
+
         // Return Data
         return view('dashboard', [
             'totalBalance'       => $totalBalance,
@@ -156,12 +188,17 @@ class DashboardController extends Controller
             'recentTransactions' => $recentTransactions,
             'savingsSummary'      => $savingsSummary,
 
+            'currentMonth' => $currentMonth,
             'currentBalance' => $currentBalance,
             'currentIncome'  => $currentIncome,
             'currentExpense' => $currentExpense,
             'balanceChange'  => $balanceChange,
             'incomeChange'   => $incomeChange,
             'expenseChange'  => $expenseChange,
+
+            'months' => $months,
+            'monthlyIncome' => $monthlyIncome,
+            'monthlyExpenses' => $monthlyExpenses,
         ]);
     }
 }
