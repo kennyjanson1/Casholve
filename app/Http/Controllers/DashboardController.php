@@ -173,6 +173,11 @@ class DashboardController extends Controller
             $monthlyExpenses[] = $expense;
         }
 
+        // Recent Transactions
+        $transactions = Transaction::with('category')
+            ->where('user_id', Auth::id())
+            ->recent(10)
+            ->get();
 
         // Return Data
         return view('dashboard', [
@@ -196,6 +201,7 @@ class DashboardController extends Controller
             'incomeChange'   => $incomeChange,
             'expenseChange'  => $expenseChange,
 
+            'transactions' => $transactions,
             'months' => $months,
             'monthlyIncome' => $monthlyIncome,
             'monthlyExpenses' => $monthlyExpenses,

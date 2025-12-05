@@ -51,10 +51,10 @@ class TransactionController extends Controller
 
         $query->orderBy('date', 'desc')->orderBy('created_at', 'desc');
 
-        $transactions = $query->paginate(15);
-        $categories = Category::forUser(auth()->user()->id)->get();
+        $transactions = Transaction::latest()->paginate(10);
+        $categories   = Category::all();
 
-        return view('transaction', compact('transactions', 'categories')); // ✅ Ubah baris ini
+        return view('transaction', compact('transactions', 'categories'));
     }
 
     public function storeBulk(Request $request)
