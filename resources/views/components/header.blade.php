@@ -46,7 +46,7 @@
             </div>
 
             <!-- Theme Toggle -->
-            <button @click=" darkMode = !darkMode; localStorage.setItem('darkMode', darkMode) "
+            <button @click="darkMode = !darkMode"
                 class="p-2 rounded-lg bg-slate-200 dark:bg-slate-700 transition">
 
                 <!-- Moon (Light Mode) -->
