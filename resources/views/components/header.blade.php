@@ -2,13 +2,18 @@
     $pageInfo = [
         'dashboard' => ['title' => 'Dashboard', 'description' => 'Track and Analyze Your Financial Performance'],
         'account' => ['title' => 'Account', 'description' => 'Manage Your Profile and Account Settings'],
-        'transaction' => ['title' => 'Transaction', 'description' => 'View and Manage All Your Transactions'],
+        'transactions' => ['title' => 'Transaction', 'description' => 'View and Manage All Your Transactions'],
         'cashflow' => ['title' => 'Cash Flow', 'description' => 'Monitor Your Income and Expense Trends'],
         'goals' => ['title' => 'Goals', 'description' => 'Track Your Savings Goals and Progress'],
     ];
 
     $currentRoute = request()->route()->getName();
-    $currentPage = $pageInfo[$currentRoute] ?? $pageInfo['dashboard'];
+    
+    // Extract the first part of route name (e.g., "transactions.index" -> "transactions")
+    $routePrefix = explode('.', $currentRoute)[0];
+    
+    // Try to get page info by full route name first, then by prefix, finally fallback to dashboard
+    $currentPage = $pageInfo[$currentRoute] ?? $pageInfo[$routePrefix] ?? $pageInfo['dashboard'];
 @endphp
 
 <header
@@ -66,30 +71,15 @@
                 </svg>
             </button>
 
-            <!-- Notifications -->
-            <button class="relative p-2 rounded-xl hover:bg-slate-100 dark:hover:bg-slate-800 hidden sm:block">
-                <svg class="w-5 h-5 text-slate-600 dark:text-slate-300" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
-                        d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9">
-                    </path>
-                </svg>
-                <span class="absolute top-2 right-2 w-2 h-2 bg-red-500 rounded-full"></span>
-            </button>
-
             <!-- User Profile -->
-            <div class="flex items-center gap-2 cursor-pointer">
+            <a href="{{ route('account') }}" class="flex items-center gap-2 cursor-pointer hover:opacity-80 transition">
                 <img src="https://images.unsplash.com/photo-1472099645785-5658abf4ff4e?w=100&h=100&fit=crop"
                     alt="Profile" class="w-8 h-8 sm:w-9 sm:h-9 rounded-full ring-2 ring-slate-100 dark:ring-slate-700">
                 <div class="hidden lg:block">
                     <p class="text-sm font-medium text-slate-900 dark:text-slate-100">{{ auth()->user()->name }}</p>
                     <p class="text-xs text-slate-500 dark:text-slate-400">{{ auth()->user()->email }}</p>
                 </div>
-                <svg class="w-4 h-4 text-slate-400 hidden lg:block" fill="none" stroke="currentColor"
-                    viewBox="0 0 24 24">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 9l-7 7-7-7"></path>
-                </svg>
-            </div>
+            </a>
         </div>
     </div>
 </header>
