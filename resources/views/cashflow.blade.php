@@ -8,7 +8,7 @@
     @include('components.cashflow.summary-cards')
 
     <!-- Monthly Cash Flow Chart -->
-    @include('components.cashflow.monthly-chart')
+    {{-- @include('components.cashflow.monthly-chart') --}}
 
     <!-- Trend Analysis -->
     @include('components.cashflow.trend-chart')

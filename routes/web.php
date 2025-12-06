@@ -8,6 +8,7 @@ use App\Http\Controllers\DashboardController;
 use App\Http\Controllers\GoalsController;
 use App\Http\Controllers\TransactionController;
 use App\Http\Controllers\SavingsTransactionController;
+use App\Http\Controllers\CashflowController;
 
 
 
@@ -64,12 +65,15 @@ Route::middleware('auth')->group(function () {
     
     /*
     |--------------------------------------------------------------------------
-    | Cashflow View
+    | Cashflow Management
     |--------------------------------------------------------------------------
     */
     Route::get('/cashflow', function () {
         return view('cashflow');
     })->name('cashflow');
+    
+    // Cashflow data API for chart
+    Route::get('/cashflow/data', [CashflowController::class, 'getData'])->name('cashflow.data');
     
     /*
     |--------------------------------------------------------------------------

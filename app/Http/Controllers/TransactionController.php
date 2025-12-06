@@ -13,46 +13,96 @@ class TransactionController extends Controller
 
     public function index(Request $request)
     {
-        $query = Transaction::where('user_id', auth()->user()->id)
+        // Start with base query
+        $query = Transaction::where('user_id', auth()->id())
             ->with('category');
 
-        if ($request->has('type') && in_array($request->type, ['income', 'expense'])) {
+        // Apply Type Filter
+        if ($request->filled('type') && in_array($request->type, ['income', 'expense'])) {
             $query->where('type', $request->type);
         }
 
-        if ($request->has('category_id')) {
+        // Apply Category Filter
+        if ($request->filled('category_id')) {
             $query->where('category_id', $request->category_id);
         }
 
-        if ($request->has('start_date') && $request->has('end_date')) {
-            $query->dateRange($request->start_date, $request->end_date);
-        } elseif ($request->has('period')) {
+        // Apply Date Range Filter
+        if ($request->filled('start_date') && $request->filled('end_date')) {
+            $query->whereDate('date', '>=', $request->start_date)
+                  ->whereDate('date', '<=', $request->end_date);
+        }
+
+        // Apply Period Filter (if no custom date range)
+        if (!$request->filled('start_date') && $request->filled('period')) {
             switch ($request->period) {
-                case 'weekly':
-                    $query->thisWeek();
+                case 'today':
+                    $query->whereDate('date', today());
                     break;
-                case 'yearly':
-                    $query->thisYear();
+                case 'yesterday':
+                    $query->whereDate('date', today()->subDay());
                     break;
-                case 'monthly':
-                default:
-                    $query->thisMonth();
+                case 'this_week':
+                    $query->whereBetween('date', [
+                        now()->startOfWeek(),
+                        now()->endOfWeek()
+                    ]);
+                    break;
+                case 'last_week':
+                    $query->whereBetween('date', [
+                        now()->subWeek()->startOfWeek(),
+                        now()->subWeek()->endOfWeek()
+                    ]);
+                    break;
+                case 'this_month':
+                    $query->whereBetween('date', [
+                        now()->startOfMonth(),
+                        now()->endOfMonth()
+                    ]);
+                    break;
+                case 'last_month':
+                    $query->whereBetween('date', [
+                        now()->subMonth()->startOfMonth(),
+                        now()->subMonth()->endOfMonth()
+                    ]);
+                    break;
+                case 'this_year':
+                    $query->whereBetween('date', [
+                        now()->startOfYear(),
+                        now()->endOfYear()
+                    ]);
                     break;
             }
         }
 
-        if ($request->has('search')) {
+        // Apply Search Filter
+        if ($request->filled('search')) {
             $search = $request->search;
             $query->where(function ($q) use ($search) {
                 $q->where('title', 'like', "%{$search}%")
-                    ->orWhere('description', 'like', "%{$search}%");
+                  ->orWhere('description', 'like', "%{$search}%")
+                  ->orWhereHas('category', function($q) use ($search) {
+                      $q->where('name', 'like', "%{$search}%");
+                  });
             });
         }
 
-        $query->orderBy('date', 'desc')->orderBy('created_at', 'desc');
+        // Sort by newest first
+        $query->orderBy('date', 'desc')
+              ->orderBy('created_at', 'desc');
 
-        $transactions = Transaction::latest()->paginate(10);
-        $categories   = Category::all();
+        // Paginate results
+        $transactions = $query->paginate(15)->withQueryString();
+
+        // Get all categories for filter dropdown
+        // Include user's categories AND default categories
+        $categories = Category::where(function($q) {
+                $q->where('user_id', auth()->id())
+                  ->orWhere('is_default', true);
+            })
+            ->orderBy('is_default', 'desc') // Default categories first
+            ->orderBy('name', 'asc')
+            ->get();
 
         return view('transaction', compact('transactions', 'categories'));
     }
@@ -88,11 +138,15 @@ class TransactionController extends Controller
             ->with('success', "{$savedCount} transaction(s) created successfully!");
     }
 
-    // ✅ BENAR
     public function create()
     {
-        $categories = Category::forUser(auth()->user()->id)->get();
-        return view('transactions.create', compact('categories')); // Atau sesuai nama file view Anda
+        // Get categories using the forUser scope from model
+        $categories = Category::forUser(auth()->id())
+            ->orderBy('is_default', 'desc')
+            ->orderBy('name', 'asc')
+            ->get();
+        
+        return view('transactions.create', compact('categories'));
     }
 
     public function store(Request $request)
@@ -106,7 +160,7 @@ class TransactionController extends Controller
             'date' => 'required|date',
         ]);
 
-        $validated['user_id'] = auth()->user()->id;
+        $validated['user_id'] = auth()->id();
 
         Transaction::create($validated);
 
@@ -116,7 +170,9 @@ class TransactionController extends Controller
 
     public function show(Transaction $transaction)
     {
-        $this->authorize('view', $transaction);
+        if ($transaction->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
 
         $transaction->load('category');
         return view('transactions.show', compact('transaction'));
@@ -124,15 +180,24 @@ class TransactionController extends Controller
 
     public function edit(Transaction $transaction)
     {
-        $this->authorize('update', $transaction);
+        if ($transaction->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
 
-        $categories = Category::forUser(auth()->user()->id)->get();
+        // Get categories using the forUser scope
+        $categories = Category::forUser(auth()->id())
+            ->orderBy('is_default', 'desc')
+            ->orderBy('name', 'asc')
+            ->get();
+        
         return view('transactions.edit', compact('transaction', 'categories'));
     }
 
     public function update(Request $request, Transaction $transaction)
     {
-        $this->authorize('update', $transaction);
+        if ($transaction->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
 
         $validated = $request->validate([
             'category_id' => 'required|exists:categories,id',
@@ -151,7 +216,9 @@ class TransactionController extends Controller
 
     public function destroy(Transaction $transaction)
     {
-        $this->authorize('delete', $transaction);
+        if ($transaction->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
 
         $transaction->delete();
 
@@ -163,7 +230,9 @@ class TransactionController extends Controller
     {
         $transaction = Transaction::withTrashed()->findOrFail($id);
 
-        $this->authorize('restore', $transaction);
+        if ($transaction->user_id !== auth()->id()) {
+            abort(403, 'Unauthorized action.');
+        }
 
         $transaction->restore();
 
@@ -174,7 +243,7 @@ class TransactionController extends Controller
     public function trash()
     {
         $transactions = Transaction::onlyTrashed()
-            ->where('user_id', auth()->user()->id)
+            ->where('user_id', auth()->id())
             ->with('category')
             ->orderBy('deleted_at', 'desc')
             ->paginate(15);

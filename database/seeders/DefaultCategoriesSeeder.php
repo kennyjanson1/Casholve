@@ -43,6 +43,14 @@ class DefaultCategoriesSeeder extends Seeder
                 'is_default' => true,
                 'user_id' => null,
             ],
+            [
+                'name' => 'Other Income',
+                'type' => 'income',
+                'icon' => '💵',
+                'color' => '#84cc16',
+                'is_default' => true,
+                'user_id' => null,
+            ],
             
             // Expense Categories
             [
@@ -137,5 +145,8 @@ class DefaultCategoriesSeeder extends Seeder
                 $category
             );
         }
+
+        $this->command->info('✅ Default categories seeded successfully!');
+        $this->command->info('📊 Total: ' . count($defaultCategories) . ' categories created');
     }
 }
