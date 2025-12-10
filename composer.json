@@ -9,6 +9,7 @@
         "php": "^8.2",
         "bref/bref": "^2.4",
         "doctrine/dbal": "^4.4",
+        "inertiajs/inertia-laravel": "^2.0",
         "laravel/framework": "^12.0",
         "laravel/tinker": "^2.10.1"
     },
@@ -68,6 +69,12 @@
         ],
         "pre-package-uninstall": [
             "Illuminate\\Foundation\\ComposerScripts::prePackageUninstall"
+        ],
+        "vercel": [
+            "npm run build",
+            "mkdir -p /vercel/output/static",
+            "cp -a public/. /vercel/output/static/",
+            "php artisan migrate --force"
         ]
     },
     "extra": {

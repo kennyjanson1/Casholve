@@ -1,23 +1,14 @@
 {
-  "version": 2,
-  "framework": null,
-  "functions": {
-    "api/index.php": { "runtime": "vercel-php@0.7.0" }
-  },
-  "routes": [
-    { "src": "/(.*)", "dest": "/api/index.php" }
-  ],
-  "builds": [
-    { "src": "api/index.php", "use": "@vercel/php" }
-  ],
-  "outputDirectory": "public",
-  "env": {
-    "APP_ENV": "production",
-    "APP_DEBUG": "false",
-    "APP_URL": "https://casholve.vercel.app",
-    "APP_KEY": "base64:WCk5DASPZ90/DIE2NHtjzEJJXmr91Ja9UiB9+/ni4es=",
-    "LOG_CHANNEL": "stderr",
-    "CACHE_DRIVER": "array",
-    "SESSION_DRIVER": "cookie"
-  }
+    "$schema": "https:\\openapi.vercel.sh/verce.json",
+    "outputDirectory": "public",
+    "functions":{
+        "api/lambda.php":{
+            "runtime": "vercel-php@0.7.4"
+        }
+    },
+    "rewrites": [{
+        "source": "/(.*)",
+        "destination": "/api/lambda.php"
+    }],
+    "buildCommand": "echo skip..."
 }
