@@ -1,4 +1,4 @@
-<div class="border border-slate-200 dark:border-slate-700 shadow-lg rounded-2xl p-6 bg-gray-100 dark:bg-slate-900">
+<div class="border border-slate-200 dark:border-slate-700 shadow-lg rounded-2xl p-6 bg-gray-100 dark:bg-slate-900 h-full flex flex-col">
     <div class="flex items-start justify-between mb-6">
         <div>
             <h3 class="text-base text-slate-600 dark:text-slate-400 mb-2">My Balance</h3>
@@ -32,25 +32,24 @@
 
         <div class="flex gap-2">
             <a href="{{ route('transactions.create') }}"
-                class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 text-sm font-medium">
+                class="bg-indigo-600 hover:bg-indigo-700 text-white rounded-lg px-4 py-2 text-sm font-medium transition">
                 Add Transaction
             </a>
         </div>
     </div>
 
 
-    <div class="grid grid-cols-2 gap-4">
+    <div class="grid grid-cols-2 gap-4 flex-1">
 
         {{-- INCOME --}}
-                <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 flex items-start gap-3">
-            <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center">
-                <!-- Icon -->
+        <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 flex items-start gap-3">
+            <div class="w-10 h-10 bg-indigo-100 dark:bg-indigo-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-indigo-600 dark:text-indigo-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M5 15l7-7 7 7" />
                 </svg>
             </div>
 
-            <div>
+            <div class="flex-1 min-w-0">
                 <p class="text-sm text-slate-600 dark:text-slate-400 mb-1">Income</p>
 
                 <p class="text-xl font-medium text-slate-900 dark:text-slate-100 mb-1">
@@ -77,7 +76,7 @@
 
         {{-- EXPENSES --}}
         <div class="bg-slate-50 dark:bg-slate-800 rounded-xl p-4 flex items-start gap-3">
-            <div class="w-10 h-10 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg flex items-center justify-center">
+            <div class="w-10 h-10 bg-cyan-100 dark:bg-cyan-900/30 rounded-lg flex items-center justify-center flex-shrink-0">
                 <svg class="w-5 h-5 text-cyan-600 dark:text-cyan-400" fill="none" stroke="currentColor"
                     viewBox="0 0 24 24">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
@@ -85,7 +84,7 @@
                 </svg>
             </div>
 
-            <div>
+            <div class="flex-1 min-w-0">
                 <p class="text-sm text-slate-600 dark:text-slate-400 mb-1">Expenses</p>
 
                 <p class="text-xl font-medium text-slate-900 dark:text-slate-100 mb-1">
@@ -111,4 +110,127 @@
         </div>
 
     </div>
+
+    {{-- CHART SECTION --}}
+    <div class="mt-6">
+        <canvas id="cashflowChart" class="w-full" height="300"></canvas>
+    </div>
 </div>
+
+<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+<script>
+    // Data dari Laravel Controller
+    const months = @json($months ?? []);
+    const monthlyIncome = @json($monthlyIncome ?? []);
+    const monthlyExpenses = @json($monthlyExpenses ?? []);
+
+    // Create Chart
+    const ctx = document.getElementById('cashflowChart').getContext('2d');
+    const cashflowChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+            labels: months,
+            datasets: [
+                {
+                    label: 'Income',
+                    data: monthlyIncome,
+                    borderColor: '#6366f1',
+                    backgroundColor: 'rgba(99, 102, 241, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#6366f1',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6,
+                    fill: true
+                },
+                {
+                    label: 'Expense',
+                    data: monthlyExpenses,
+                    borderColor: '#06b6d4',
+                    backgroundColor: 'rgba(6, 182, 212, 0.1)',
+                    borderWidth: 3,
+                    tension: 0.4,
+                    pointRadius: 4,
+                    pointBackgroundColor: '#06b6d4',
+                    pointBorderColor: '#fff',
+                    pointBorderWidth: 2,
+                    pointHoverRadius: 6,
+                    fill: true
+                }
+            ]
+        },
+        options: {
+            responsive: true,
+            maintainAspectRatio: false,
+            plugins: {
+                legend: {
+                    display: true,
+                    position: 'bottom',
+                    labels: {
+                        color: '#94a3b8',
+                        padding: 15,
+                        font: {
+                            size: 12
+                        },
+                        usePointStyle: true,
+                        pointStyle: 'circle'
+                    }
+                },
+                tooltip: {
+                    backgroundColor: 'rgba(15, 23, 42, 0.9)',
+                    titleColor: '#f1f5f9',
+                    bodyColor: '#cbd5e1',
+                    borderColor: '#334155',
+                    borderWidth: 1,
+                    padding: 12,
+                    displayColors: true,
+                    callbacks: {
+                        label: function(context) {
+                            let label = context.dataset.label || '';
+                            if (label) {
+                                label += ': ';
+                            }
+                            label += 'Rp ' + new Intl.NumberFormat('id-ID').format(context.parsed.y);
+                            return label;
+                        }
+                    }
+                }
+            },
+            scales: {
+                x: {
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#94a3b8',
+                        font: {
+                            size: 11
+                        }
+                    }
+                },
+                y: {
+                    grid: {
+                        color: 'rgba(148, 163, 184, 0.1)',
+                        drawBorder: false
+                    },
+                    ticks: {
+                        color: '#94a3b8',
+                        font: {
+                            size: 11
+                        },
+                        callback: function(value) {
+                            return 'Rp ' + (value / 1000).toFixed(0) + 'k';
+                        }
+                    }
+                }
+            },
+            interaction: {
+                intersect: false,
+                mode: 'index'
+            }
+        }
+    });
+</script>
