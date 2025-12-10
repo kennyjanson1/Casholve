@@ -74,7 +74,7 @@
             "npm run build",
             "mkdir -p /vercel/output/static",
             "cp -a public/. /vercel/output/static/",
-            "php artisan migrate --force"
+            "php artisan migrate"
         ]
     },
     "extra": {
